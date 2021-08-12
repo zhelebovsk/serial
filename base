@@ -1,0 +1,21 @@
+
+while True:
+
+
+
+    details = pytesseract.image_to_string(thresh,
+                                          config=custom_config,
+                                          lang=lang)
+    cv.putText(image, details[0:3],
+                (100,100),
+                cv.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 255, 0),
+                2)
+    cv.imshow(out, image)
+    cv.imshow(crop_bar, thresh)
+    #print(details)
+    if cv.waitKey(1) & 0xFF == ord('q'):
+        break
+vid.release()
+cv.destroyAllWindows()
