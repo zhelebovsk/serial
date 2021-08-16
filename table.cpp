@@ -170,10 +170,10 @@ int main(void)
   int32_t StepsLeft = 0;
   int dir = 0;
   char buffr[2] = "z\n";
-  float vlim = 6400.0; // 6400 st/sec = 2 rev/sec = 16 mm/sec
+  float vlim = 3200.0; // 6400 st/sec = 2 rev/sec = 16 mm/sec
   //float v0 = 100.0;
-  float v0 = 6400.0;
-  int eps = 3200.0; // 6400 st/sec^2 =
+  float v0 = 1500.0;
+  int eps = 2400.0; // 6400 st/sec^2 =
   int bSteps = (int)(1000000.0/(vlim));
   int tictok = (int)bSteps/2;
   int start = 0;
@@ -202,14 +202,19 @@ int main(void)
 	  HAL_UART_Receive_IT(&huart1, (uint8_t*)buffr, 1);
 	  if (buffr[0] != 'z') {
 		  HAL_UART_Transmit_IT(&huart1, (uint8_t*)buffr, 2);
-		  if (buffr[0] == 'l') {HAL_GPIO_WritePin(GPIOB, DIR1_Pin, RESET); dir = 0;}
-		  else if (buffr[0] == 'r') {HAL_GPIO_WritePin(GPIOB, DIR1_Pin, SET); dir = 1;}
+		  if (buffr[0] == 'r') {HAL_GPIO_WritePin(GPIOB, DIR1_Pin, RESET); dir = 0;}
+		  else if (buffr[0] == 'l') {HAL_GPIO_WritePin(GPIOB, DIR1_Pin, SET); dir = 1;}
 		  else if (buffr[0] == 'f') {HAL_GPIO_WritePin(GPIOB, DIR2_Pin, RESET); dir = 2;}
 		  else if (buffr[0] == 'b') {HAL_GPIO_WritePin(GPIOB, DIR2_Pin, SET); dir = 3;}
 		  //else if (buffr[0] == '1') {StepsLeft = 100;start = 1;}
 		  //else if (buffr[0] == '2') {StepsLeft = 200;start = 1;}
 		  //else if (buffr[0] == '3') {StepsLeft = 300;start = 1;}
-		  else if (buffr[0] == '4') {StepsLeft = 400;start = 1;}
+		  else if (buffr[0] == 'm') {StepsLeft = 10000; start = 1;}
+		  else if (buffr[0] == 'M') {StepsLeft = 10000 * 20; start = 1;}
+		  else if (buffr[0] == 'n') {StepsLeft = 7000; start = 1;}
+		  else if (buffr[0] == 'N') {StepsLeft = 7000 * 4; start = 1;}
+		  else if (buffr[0] == 'o') {StepsLeft = 400; start = 1;}
+		  else if (buffr[0] == 'h') {StepsLeft = 200; start = 1;}
 		  //else if (buffr[0] == '5') {StepsLeft = 500;start = 1;}
 		  //else if (buffr[0] == '6') {StepsLeft = 600;start = 1;}
 		  //else if (buffr[0] == '7') {StepsLeft = 700;start = 1;}

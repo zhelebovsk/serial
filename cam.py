@@ -27,10 +27,10 @@ if __name__ == '__main__':
     cv.createTrackbar('Gauss', window, 5, 30, nothing)
     cv.createTrackbar('kernel', window, 5, 30, nothing)
 
-    cv.createTrackbar('x0', crop_bar, 0, 1000, nothing)
-    cv.createTrackbar('x1', crop_bar, 240, 1000, nothing)
-    cv.createTrackbar('y0', crop_bar, 590, 1000, nothing)
-    cv.createTrackbar('y1', crop_bar, 700, 1000, nothing)
+    cv.createTrackbar('x0', crop_bar, 210, 1000, nothing)
+    cv.createTrackbar('x1', crop_bar, 293, 1000, nothing)
+    cv.createTrackbar('y0', crop_bar, 657, 1000, nothing)
+    cv.createTrackbar('y1', crop_bar, 834, 1000, nothing)
 
 
     while True:
@@ -50,13 +50,15 @@ if __name__ == '__main__':
 
         if gauss > 0:
             gray = cv.blur(gray, (gauss, gauss))
+
+        print('mean grey - ', np.mean(gray))
         thresh = cv.threshold(gray, 0, 255,
                               cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
         if kernel > 0:
             kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (kernel, kernel))
             # thresh = cv.morphologyEx(thresh, cv.MORPH_OPEN, kernel)
             thresh = cv.erode(thresh, kernel, iterations=1)
-
+        print('mean thresh - ', np.mean(thresh))
         details = pytesseract.image_to_string(thresh,
                                               config=custom_config,
                                               lang=lang)
