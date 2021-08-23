@@ -9,33 +9,38 @@ import numpy as np
 
 def read_data(vid, x0, x1, y0, y1, gauss, kernel, custom_config, lang, num, current_pos):
     velocity = []
-    #for i in range(12):
+    i = 0
     while len(velocity) < 12:
-        ret, image = vid.read()
-        image = image[x0:x1, y0:y1]
-        gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-        if gauss > 0:
-            gray = cv.blur(gray, (gauss, gauss))
-        # провека оттенков серого !!! подобрать диапазон по cam.py
-        if np.mean(gray) < 200:
-            continue
-        if np.mean(gray) > 250:
-            continue
-        # конец проверки
-        thresh = cv.threshold(gray, 0, 255,
-                              cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
-        if kernel > 0:
-            k = cv.getStructuringElement(cv.MORPH_ELLIPSE, (kernel, kernel))
-            thresh = cv.erode(thresh, k, iterations=1)
-        # проверка чб изображения !!! подобрать диапазон по cam.py
-        if np.mean(thresh) < 200:
-            continue
-        if np.mean(thresh) > 250:
-            continue
-        # конец проверки
-        details = pytesseract.image_to_string(thresh,
-                                              config=custom_config,
-                                              lang=lang)
+        i += 1
+        details = []
+        ch = 1
+        while ch:
+            ret, image = vid.read()
+            image = image[x0:x1, y0:y1]
+            gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+            if gauss > 0:
+                gray = cv.blur(gray, (gauss, gauss))
+            # провека оттенков серого !!! подобрать диапазон по cam.py
+            if np.mean(gray) < 100:
+                continue
+            if np.mean(gray) > 150:
+                continue
+            # конец проверки
+            thresh = cv.threshold(gray, 0, 255,
+                                  cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
+            if kernel > 0:
+                k = cv.getStructuringElement(cv.MORPH_ELLIPSE, (kernel, kernel))
+                thresh = cv.erode(thresh, k, iterations=1)
+            # проверка чб изображения !!! подобрать диапазон по cam.py
+            if np.mean(thresh) < 150:
+                continue
+            if np.mean(thresh) > 220:
+                continue
+            # конец проверки
+            details = pytesseract.image_to_string(thresh,
+                                                  config=custom_config,
+                                                  lang=lang)
+            ch = 0
         cv.putText(image, details[0:3],
                    (50, 50),
                    cv.FONT_HERSHEY_SIMPLEX,
@@ -57,18 +62,19 @@ if __name__ == '__main__':
     os.chdir('data')
     # cam init
     vid = cv.VideoCapture(0)
-    vid.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
-    vid.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
+    time.sleep(3)
+    vid.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+    vid.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     # check correct params with cam.py
     gauss = 3
-    kernel = 5
-    x0 = 210
-    x1 = 293
-    y0 = 657
-    y1 = 834
+    kernel = 3
+    x0 = 440
+    x1 = 538
+    y0 = 827
+    y1 = 1015
     # field and points
-    # m = 21
-    # n = 5
+    #m = 21
+    #n = 5
     m = 3
     n = 3
     num = 0

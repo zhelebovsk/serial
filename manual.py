@@ -23,6 +23,7 @@ def movement(q):
 if __name__ == '__main__':
     table_hc6 = serial.Serial('COM3')
     while True:
+        print('way = ')
         way = input()
         if way == 'q':
             break

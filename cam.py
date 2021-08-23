@@ -3,7 +3,7 @@ from matplotlib import pyplot
 import numpy as np
 import pytesseract
 import serial
-
+import time
 
 def nothing(a):
     pass
@@ -22,25 +22,26 @@ if __name__ == '__main__':
     cv.namedWindow(out)
 
     vid = cv.VideoCapture(0)
-    vid.set(cv.CAP_PROP_FRAME_WIDTH, 1280)
-    vid.set(cv.CAP_PROP_FRAME_HEIGHT, 720)
+    vid.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
+    vid.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     cv.createTrackbar('Gauss', window, 5, 30, nothing)
     cv.createTrackbar('kernel', window, 5, 30, nothing)
 
-    cv.createTrackbar('x0', crop_bar, 210, 1000, nothing)
-    cv.createTrackbar('x1', crop_bar, 293, 1000, nothing)
-    cv.createTrackbar('y0', crop_bar, 657, 1000, nothing)
-    cv.createTrackbar('y1', crop_bar, 834, 1000, nothing)
+    cv.createTrackbar('x0', window, 440, 1080, nothing)
+    cv.createTrackbar('x1', window, 538, 1080, nothing)
+    cv.createTrackbar('y0', window, 827, 1920, nothing)
+    cv.createTrackbar('y1', window, 1015, 1920, nothing)
 
 
     while True:
+        t0 = time.time()
         gauss = cv.getTrackbarPos('Gauss', window)
         kernel = cv.getTrackbarPos('kernel', window)
 
-        x0 = cv.getTrackbarPos('x0', crop_bar)
-        x1 = cv.getTrackbarPos('x1', crop_bar)
-        y0 = cv.getTrackbarPos('y0', crop_bar)
-        y1 = cv.getTrackbarPos('y1', crop_bar)
+        x0 = cv.getTrackbarPos('x0', window)
+        x1 = cv.getTrackbarPos('x1', window)
+        y0 = cv.getTrackbarPos('y0', window)
+        y1 = cv.getTrackbarPos('y1', window)
 
         ret, image = vid.read()
         cv.imshow(window, image)
@@ -70,7 +71,9 @@ if __name__ == '__main__':
                    2)
         cv.imshow(out, image)
         cv.imshow(crop_bar, thresh)
-
+        t = time.time()
+        print(1/(t - t0))
+        print(t)
         if cv.waitKey(1) == ord('q'):
             break
     vid.release()
