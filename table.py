@@ -8,47 +8,57 @@ import numpy as np
 
 
 def read_data(vid, x0, x1, y0, y1, gauss, kernel, custom_config, lang, num, current_pos):
+    print('shot')
     velocity = []
     i = 0
     while len(velocity) < 12:
         i += 1
         details = []
-        ch = 1
+        ch = True
         while ch:
-            ret, image = vid.read()
-            image = image[x0:x1, y0:y1]
-            gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
-            if gauss > 0:
-                gray = cv.blur(gray, (gauss, gauss))
-            # провека оттенков серого !!! подобрать диапазон по cam.py
-            if np.mean(gray) < 100:
-                continue
-            if np.mean(gray) > 150:
-                continue
-            # конец проверки
-            thresh = cv.threshold(gray, 0, 255,
-                                  cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
-            if kernel > 0:
-                k = cv.getStructuringElement(cv.MORPH_ELLIPSE, (kernel, kernel))
-                thresh = cv.erode(thresh, k, iterations=1)
-            # проверка чб изображения !!! подобрать диапазон по cam.py
-            if np.mean(thresh) < 150:
-                continue
-            if np.mean(thresh) > 220:
-                continue
-            # конец проверки
-            details = pytesseract.image_to_string(thresh,
-                                                  config=custom_config,
-                                                  lang=lang)
-            ch = 0
-        cv.putText(image, details[0:3],
+            while len(details) < 3:
+                ret, image = vid.read()
+                image = image[x0:x1, y0:y1]
+                gray = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
+                if gauss > 0:
+                    gray = cv.blur(gray, (gauss, gauss))
+                # провека оттенков серого !!! подобрать диапазон по cam.py
+                if np.mean(gray) < 80:
+                    print('grey test error - ', np.mean(gray))
+                    continue
+                if np.mean(gray) > 120:
+                    print('grey test error - ', np.mean(gray))
+                    continue
+                # конец проверки
+                thresh = cv.threshold(gray, 0, 255,
+                                      cv.THRESH_BINARY | cv.THRESH_OTSU)[1]
+                if kernel > 0:
+                    k = cv.getStructuringElement(cv.MORPH_ELLIPSE, (kernel, kernel))
+                    thresh = cv.erode(thresh, k, iterations=1)
+                # проверка чб изображения !!! подобрать диапазон по cam.py
+                if np.mean(thresh) < 150:
+                    print('thresh test error - ', np.mean(thresh))
+                    continue
+                if np.mean(thresh) > 220:
+                    print('thresh test error - ', np.mean(thresh))
+                    continue
+                # конец проверки
+                details.append(pytesseract.image_to_string(thresh, config=custom_config, lang=lang))
+            det = details.pop(0)
+            for d in details:
+                if det != d:
+                    print('3 check error')
+                    break
+            else:
+                ch = False
+        cv.putText(image, det[0:3],
                    (50, 50),
                    cv.FONT_HERSHEY_SIMPLEX,
                    1,
                    (0, 255, 0),
                    2)
         cv.imwrite(str(num) + '.' + str(current_pos) + str(i) + '.bmp', image)
-        velocity.append(details)
+        velocity.append(det)
         time.sleep(1.1)
     print(velocity)
     return velocity
@@ -62,21 +72,21 @@ if __name__ == '__main__':
     os.chdir('data')
     # cam init
     vid = cv.VideoCapture(0)
-    time.sleep(3)
+    time.sleep(0.5)
     vid.set(cv.CAP_PROP_FRAME_WIDTH, 1920)
     vid.set(cv.CAP_PROP_FRAME_HEIGHT, 1080)
     # check correct params with cam.py
-    gauss = 3
-    kernel = 3
-    x0 = 440
+    gauss = 2
+    kernel = 2
+    x0 = 475
     x1 = 538
-    y0 = 827
-    y1 = 1015
+    y0 = 903
+    y1 = 1031
     # field and points
-    #m = 21
-    #n = 5
-    m = 3
-    n = 3
+    m = 21
+    n = 5
+    #m = 4
+    #n = 4
     num = 0
     pos = []
     # open new csv file
@@ -91,7 +101,7 @@ if __name__ == '__main__':
     move = [0, 0]
 
     vel = read_data(vid, x0, x1, y0, y1, gauss, kernel, custom_config, lang, num, current_pos)
-    f.write(str(num) + '\t' + str(current_pos[1:-1]) + '\t')
+    f.write(str(num) + '\t' + str(current_pos[0:]) + '\t')
     for v in vel:
         f.write(v[0] + '.' + v[1:3] + '\t')
     f.write('\n')
@@ -117,7 +127,7 @@ if __name__ == '__main__':
         table_hc6.write(st_num.encode('utf-8'))
         time.sleep(7)
         vel = read_data(vid, x0, x1, y0, y1, gauss, kernel, custom_config, lang, num, i)
-        f.write(str(num) + '\t' + str(i[1:-1]) + '\t')
+        f.write(str(num) + '\t' + str(i[0:]) + '\t')
         for v in vel:
             f.write(v[0] + '.' + v[1:3] + '\t')
             #f.write(v[0:3] + '\t')

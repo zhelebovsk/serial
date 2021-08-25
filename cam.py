@@ -27,10 +27,10 @@ if __name__ == '__main__':
     cv.createTrackbar('Gauss', window, 5, 30, nothing)
     cv.createTrackbar('kernel', window, 5, 30, nothing)
 
-    cv.createTrackbar('x0', window, 440, 1080, nothing)
+    cv.createTrackbar('x0', window, 475, 1080, nothing)
     cv.createTrackbar('x1', window, 538, 1080, nothing)
-    cv.createTrackbar('y0', window, 827, 1920, nothing)
-    cv.createTrackbar('y1', window, 1015, 1920, nothing)
+    cv.createTrackbar('y0', window, 903, 1920, nothing)
+    cv.createTrackbar('y1', window, 1031, 1920, nothing)
 
 
     while True:
